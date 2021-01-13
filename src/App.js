@@ -3,14 +3,20 @@ import { Select, MenuItem, Card, CardContent } from '@material-ui/core'
 import { FormControl } from '@material-ui/core'
 import './App.css'
 import Infobox from './Infobox'
-import Map from './Map'
+
 import Table from './Table'
 import { sortData } from './util'
+import LineGraph from './LineGraph'
+import Mapper from './Mapper'
+import 'leaflet/dist/leaflet.css'
 function App() {
   const [countries, setCountries] = useState([])
   const [country, setCountry] = useState('worldwide')
   const [countryInfo, setCountryInfo] = useState({})
   const [tableData, setTableData] = useState([])
+  const [mapCenter, setMapCenter] = useState({ lat: 34.80746, lng: -40.4796 })
+  const [mapCountries, setMapCountries] = useState([])
+  const [mapZoom, setMapZoom] = useState(3)
 
   //state is something that sets value
   //https://disease.sh/v3/covid-19/countries
@@ -32,7 +38,7 @@ function App() {
           }))
 
           let sortedData = sortData(data)
-          console.log(sortedData)
+
           setCountries(countries)
           setTableData(sortedData)
         })
@@ -53,10 +59,13 @@ function App() {
         .then((data) => {
           setCountry(countryCode)
           setCountryInfo(data)
+          setMapCountries(data)
+
+          setMapCenter([data.countryInfo.lat, data.countryInfo.long])
+          setMapZoom(4)
         })
     }
     a()
-    console.log(countryInfo)
   }
 
   return (
@@ -95,7 +104,7 @@ function App() {
             total={countryInfo.deaths}
           />
         </div>
-        <Map></Map>
+        <Mapper countries={mapCountries} zoom={mapZoom} center={mapCenter} />
       </div>
       <Card className='app__right'>
         <CardContent>
@@ -103,6 +112,7 @@ function App() {
 
           <Table countries={tableData} />
           <h3>Worldwide new Cases</h3>
+          <LineGraph />
         </CardContent>
       </Card>
     </div>
